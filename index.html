@@ -1,0 +1,371 @@
+
+<html><head><base href="https://crackedegg.coin/"><title>Cracked Egg Coin - Hatch Your Crypto Fortune!</title><style>
+    @keyframes glow {
+        0% { text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700, 0 0 20px #FFA500, 0 0 25px #FFA500, 0 0 30px #FFA500, 0 0 35px #FFA500; }
+        50% { text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700, 0 0 40px #FFA500, 0 0 50px #FFA500, 0 0 60px #FFA500, 0 0 70px #FFA500; }
+        100% { text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700, 0 0 20px #FFA500, 0 0 25px #FFA500, 0 0 30px #FFA500, 0 0 35px #FFA500; }
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes rotateGradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: 'Roboto', sans-serif;
+        overflow: hidden;
+    }
+    .container {
+        height: 100vh;
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory;
+    }
+    .section {
+        height: 100vh;
+        scroll-snap-align: start;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        position: relative;
+    }
+    #hero {
+        background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00, #FF7F50, #FF6347, #FFD700);
+        background-size: 600% 600%;
+        animation: rotateGradient 15s ease infinite;
+        position: relative;
+        overflow: hidden;
+    }
+    #hero::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url('https://clipground.com/images/broken-egg-png-18.png');
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        animation: fadeIn 2s ease-in-out forwards;
+    }
+    #about {
+        background: linear-gradient(45deg, #4B0082, #8A2BE2, #9400D3, #8B008B, #9932CC, #4B0082);
+        background-size: 600% 600%;
+        animation: rotateGradient 15s ease infinite;
+    }
+    #game {
+        background: linear-gradient(45deg, #228B22, #32CD32, #00FA9A, #3CB371, #2E8B57, #228B22);
+        background-size: 600% 600%;
+        animation: rotateGradient 15s ease infinite;
+    }
+    #tokenomics {
+        background: linear-gradient(45deg, #B22222, #FF6347, #FF4500, #FF0000, #DC143C, #B22222);
+        background-size: 600% 600%;
+        animation: rotateGradient 15s ease infinite;
+    }
+    .content {
+        text-align: center;
+        z-index: 2;
+        position: relative;
+    }
+    h1 {
+        font-size: 4em;
+        margin-bottom: 20px;
+        animation: glow 1.5s infinite, pulse 1.5s infinite;
+    }
+    .subtitle {
+        font-size: 1.5em;
+        margin-bottom: 30px;
+        animation: glow 1.5s infinite, pulse 1.5s infinite;
+    }
+    p { font-size: 1.2em; max-width: 600px; margin: 0 auto 20px; }
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #fff;
+        color: #000;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: bold;
+        transition: transform 0.3s ease;
+        margin: 0 10px;
+        cursor: pointer;
+    }
+    .btn:hover { transform: scale(1.1); }
+    #egg {
+        width: 200px;
+        height: 250px;
+        background: #fff;
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        margin: 20px auto;
+    }
+    .crack {
+        position: absolute;
+        background: #FFD700;
+        transition: all 0.5s ease;
+    }
+    #score {
+        font-size: 2em;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .coin {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background: #FFD700;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        animation: float 3s infinite ease-in-out;
+    }
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        background: rgba(0,0,0,0.5);
+        text-align: center;
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    #contractAddress {
+        background-color: #fff;
+        color: #333;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.9em;
+        margin-right: 10px;
+    }
+    .address-container {
+        display: flex;
+        align-items: center;
+    }
+    .social-buttons {
+        display: flex;
+        justify-content: center;
+        flex-grow: 1;
+    }
+    .chain-info {
+        color: #fff;
+        font-weight: bold;
+        font-size: 1.1em;
+        text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333;
+        margin-left: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .chain-info img {
+        width: 20px;
+        height: 20px;
+        margin: 0 5px;
+    }
+    #muteBtn {
+        background-color: #fff;
+        border: none;
+        color: #000;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        transition: background-color 0.3s;
+    }
+    #muteBtn:hover {
+        background-color: #e0e0e0;
+    }
+    #muteBtn.muted {
+        background-color: #ff4d4d;
+        color: #fff;
+    }
+</style></head>
+<body>
+<div class="container">
+    <section id="hero" class="section">
+        <div class="content">
+            <h1>Cracked Egg Coin</h1>
+            <p class="subtitle">Hatch Your Crypto Fortune with the Eggciting New Meme Coin!</p>
+            <a href="#about" class="btn">Go on..</a>
+        </div>
+    </section>
+    
+    <section id="about" class="section">
+        <div class="content">
+            <h2>The Eggstraordinary Coin</h2>
+            <p>Cracked Egg Coin is not just another meme coin - it's a revolution in the crypto world! Our egg-shaped token is designed to crack open new possibilities in decentralized finance.</p>
+            <a href="#game" class="btn">Discover More</a>
+        </div>
+    </section>
+    
+    <section id="game" class="section">
+        <div class="content">
+            <h2>Crack the Egg</h2>
+            <p>Play games and enter contests to earn and win $CEGG tokens!</p>
+            <div id="egg"></div>
+            <div id="score">Score: 0 $CEGG</div>
+            <a href="http://crackedegg.solofolio.net/game" class="btn" target="_blank">Take a crack at some games</a>
+        </div>
+    </section>
+    
+    <section id="tokenomics" class="section">
+        <div class="content">
+            <h2>Eggonomics</h2>
+            <p>Total Supply: 1,000,000,000 $CEGG<br>
+            Liquidity Locked: 7%<br>
+            Team Allocation: 2%<br>
+            Marketing: 2%<br>
+            Community Rewards: TBA</p>
+            <a href="https://ape.store/base/0x0aa5317eb9a707fbc8c2ea7345d7968e670ed952" class="btn" target="_blank">Buy on Ape Store</a>
+        </div>
+    </section>
+</div>
+
+<footer>
+    <div class="address-container">
+        <span id="contractAddress">0x0aa5317eb9a707fbc8c2ea7345d7968e670ed952</span>
+        <button class="btn" id="copyAddress">Copy Address</button>
+        <span class="chain-info">
+            Coin on
+            <img src="https://basescan.org/assets/base/images/svg/logos/chain-dim.svg" alt="Base Chain Logo" width="20" height="20">
+            Base Chain
+        </span>
+    </div>
+    <div class="social-buttons">
+        <a href="https://t.me/+dCjRXb8TP_8wZDdh" class="btn" target="_blank">Join Telegram</a>
+        <a href="https://x.com/CrackedEggCoin" class="btn" target="_blank">Follow on X</a>
+    </div>
+    <button id="muteBtn">🔊</button>
+</footer>
+
+<audio id="bgMusic" loop>
+    <source src="https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<script>
+    let score = 0;
+    const egg = document.getElementById('egg');
+    const scoreDisplay = document.getElementById('score');
+    let cracks = [];
+
+    const bgMusic = document.getElementById('bgMusic');
+    const muteBtn = document.getElementById('muteBtn');
+    let isMuted = false;
+
+    window.addEventListener('load', () => {
+        bgMusic.volume = 0.3;
+        bgMusic.play();
+    });
+
+    muteBtn.addEventListener('click', () => {
+        if (isMuted) {
+            bgMusic.play();
+            muteBtn.textContent = '🔊';
+            muteBtn.classList.remove('muted');
+        } else {
+            bgMusic.pause();
+            muteBtn.textContent = '🔇';
+            muteBtn.classList.add('muted');
+        }
+        isMuted = !isMuted;
+    });
+
+    egg.addEventListener('click', () => {
+        score++;
+        scoreDisplay.textContent = `Score: ${score} $CEGG`;
+        addCrack();
+
+        if (score % 10 === 0) {
+            spawnCoin();
+        }
+    });
+
+    function addCrack() {
+        const crack = document.createElement('div');
+        crack.className = 'crack';
+        const size = Math.random() * 30 + 20;
+        const left = Math.random() * (200 - size);
+        const top = Math.random() * (250 - size);
+        crack.style.width = `${size}px`;
+        crack.style.height = `${size}px`;
+        crack.style.left = `${left}px`;
+        crack.style.top = `${top}px`;
+        crack.style.clipPath = `polygon(${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%)`;
+        egg.appendChild(crack);
+        cracks.push(crack);
+
+        if (cracks.length > 10) {
+            egg.removeChild(cracks.shift());
+        }
+    }
+
+    function spawnCoin() {
+        const coin = document.createElement('div');
+        coin.className = 'coin';
+        coin.textContent = '$CEGG';
+        coin.style.left = `${Math.random() * 100}%`;
+        coin.style.top = `${Math.random() * 100}%`;
+        document.getElementById('game').appendChild(coin);
+
+        setTimeout(() => {
+            coin.remove();
+        }, 3000);
+    }
+
+    // Smooth scrolling for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+
+    // Copy contract address to clipboard
+    document.getElementById('copyAddress').addEventListener('click', function() {
+        const contractAddress = document.getElementById('contractAddress').textContent;
+        navigator.clipboard.writeText(contractAddress).then(() => {
+            alert('Contract address copied to clipboard!');
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+        });
+    });
+</script>
+</body></html>
