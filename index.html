@@ -93,6 +93,60 @@
         background: linear-gradient(45deg, #4B0082, #8A2BE2, #9400D3, #8B008B, #9932CC, #4B0082);
         background-size: 600% 600%;
         animation: rotateGradient 15s ease infinite;
+        position: relative;
+        overflow: hidden;
+    }
+    .flying-egg {
+        position: absolute;
+        width: 60px;
+        height: 80px;
+        background: radial-gradient(ellipse at center, #FFD700 0%, #FFA500 100%);
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        pointer-events: none;
+    }
+    @keyframes flyLeftToRight {
+        from { left: -60px; }
+        to { left: 100vw; }
+    }
+    @keyframes flyRightToLeft {
+        from { right: -60px; }
+        to { right: 100vw; }
+    }
+    @keyframes flyBottomToTop {
+        from { bottom: -80px; }
+        to { bottom: 100vh; }
+    }
+    @keyframes flyTopToBottom {
+        from { top: -80px; }
+        to { top: 100vh; }
+    }
+    @keyframes flyDiagonal1 {
+        from { left: -60px; top: -80px; }
+        to { left: 100vw; top: 100vh; }
+    }
+    @keyframes flyDiagonal2 {
+        from { right: -60px; top: -80px; }
+        to { right: 100vw; top: 100vh; }
+    }
+    @keyframes flyDiagonal3 {
+        from { left: -60px; bottom: -80px; }
+        to { left: 100vw; bottom: 100vh; }
+    }
+    @keyframes flyDiagonal4 {
+        from { right: -60px; bottom: -80px; }
+        to { right: 100vw; bottom: 100vh; }
+    }
+    @keyframes zoomInOut {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.5); }
+    }
+    @keyframes rotateLeft {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(-360deg); }
+    }
+    @keyframes rotateRight {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
     #game {
         background: linear-gradient(45deg, #228B22, #32CD32, #00FA9A, #3CB371, #2E8B57, #228B22);
@@ -382,124 +436,153 @@
     let cracks = [];
 
     const bgMusic = document.getElementById('bgMusic');
-    const muteBtn = document.getElementById('muteBtn');
-    let isMuted = false;
+const muteBtn = document.getElementById('muteBtn');
+let isMuted = false;
 
-    window.addEventListener('load', () => {
-        bgMusic.volume = 0.3;
+window.addEventListener('load', () => {
+    bgMusic.volume = 0.3;
+    bgMusic.play();
+    createFlyingEggs();
+    createFlyingCEGGs();
+});
+
+muteBtn.addEventListener('click', () => {
+    if (isMuted) {
         bgMusic.play();
-        createFlyingCEGGs();
-    });
-
-    muteBtn.addEventListener('click', () => {
-        if (isMuted) {
-            bgMusic.play();
-            muteBtn.textContent = '🔊';
-            muteBtn.classList.remove('muted');
-        } else {
-            bgMusic.pause();
-            muteBtn.textContent = '🔇';
-            muteBtn.classList.add('muted');
-        }
-        isMuted = !isMuted;
-    });
-
-    egg.addEventListener('click', () => {
-        score++;
-        scoreDisplay.textContent = `Score: ${score} $CEGG`;
-        addCrack();
-        spawnCoins(3);
-    });
-
-    function addCrack() {
-        const crack = document.createElement('div');
-        crack.className = 'crack';
-        const size = Math.random() * 30 + 20;
-        const left = Math.random() * (200 - size);
-        const top = Math.random() * (250 - size);
-        crack.style.width = `${size}px`;
-        crack.style.height = `${size}px`;
-        crack.style.left = `${left}px`;
-        crack.style.top = `${top}px`;
-        crack.style.clipPath = `polygon(${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%)`;
-        egg.appendChild(crack);
-        cracks.push(crack);
-
-        if (cracks.length > 10) {
-            egg.removeChild(cracks.shift());
-        }
+        muteBtn.textContent = '🔊';
+        muteBtn.classList.remove('muted');
+    } else {
+        bgMusic.pause();
+        muteBtn.textContent = '🔇';
+        muteBtn.classList.add('muted');
     }
+    isMuted = !isMuted;
+});
 
-    function spawnCoins(count) {
-        for (let i = 0; i < count; i++) {
-            const coin = document.createElement('div');
-            coin.className = 'coin';
-            coin.textContent = '$CEGG';
-            coin.style.left = `${Math.random() * 100}%`;
-            coin.style.top = `${Math.random() * 100}%`;
-            document.getElementById('game').appendChild(coin);
+egg.addEventListener('click', () => {
+    score++;
+    scoreDisplay.textContent = `Score: ${score} $CEGG`;
+    addCrack();
+    spawnCoins(3);
+});
 
-            setTimeout(() => {
-                coin.remove();
-            }, 3000);
-        }
+function addCrack() {
+    const crack = document.createElement('div');
+    crack.className = 'crack';
+    const size = Math.random() * 30 + 20;
+    const left = Math.random() * (200 - size);
+    const top = Math.random() * (250 - size);
+    crack.style.width = `${size}px`;
+    crack.style.height = `${size}px`;
+    crack.style.left = `${left}px`;
+    crack.style.top = `${top}px`;
+    crack.style.clipPath = `polygon(${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%)`;
+    egg.appendChild(crack);
+    cracks.push(crack);
+
+    if (cracks.length > 10) {
+        egg.removeChild(cracks.shift());
     }
+}
 
-    function createFlyingCEGGs() {
-        const tokenomicsSection = document.getElementById('tokenomics');
+function spawnCoins(count) {
+    for (let i = 0; i < count; i++) {
+        const coin = document.createElement('div');
+        coin.className = 'coin';
+        coin.textContent = '$CEGG';
+        coin.style.left = `${Math.random() * 100}%`;
+        coin.style.top = `${Math.random() * 100}%`;
+        document.getElementById('game').appendChild(coin);
+
+        setTimeout(() => {
+            coin.remove();
+        }, 3000);
+    }
+}
+
+function createFlyingEggs() {
+    const aboutSection = document.getElementById('about');
+    const eggCount = 20;
+    const animations = [
+        'flyLeftToRight', 'flyRightToLeft', 'flyBottomToTop', 'flyTopToBottom',
+        'flyDiagonal1', 'flyDiagonal2', 'flyDiagonal3', 'flyDiagonal4'
+    ];
+    const rotations = ['rotateLeft', 'rotateRight'];
+
+    for (let i = 0; i < eggCount; i++) {
+        const egg = document.createElement('div');
+        egg.className = 'flying-egg';
         
-        setInterval(() => {
-            const cegg = document.createElement('div');
-            cegg.className = 'flying-cegg';
-            
-            const wingTop = document.createElement('div');
-            wingTop.className = 'wings wing-top';
-            const wingBottom = document.createElement('div');
-            wingBottom.className = 'wings wing-bottom';
-            
-            cegg.appendChild(wingTop);
-            cegg.appendChild(wingBottom);
-            
-            const top = Math.random() * 80 + 10; // Keep within 10-90% of the height
-            cegg.style.top = `${top}%`;
-            
-            const animationDuration = Math.random() * 4 + 1; // 1-5 seconds
-            cegg.style.animation = `flyCEGG ${animationDuration}s linear`;
-            
-            tokenomicsSection.appendChild(cegg);
-            
-            // Create trail
-            const trail = document.createElement('div');
-            trail.className = 'trail';
-            trail.style.top = `${top}%`;
-            trail.style.left = '0';
-            tokenomicsSection.appendChild(trail);
-            
-            setTimeout(() => {
-                cegg.remove();
-                trail.remove();
-            }, animationDuration * 1000);
-        }, 500); // Create a new CEGG every 500ms
+        const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+        const randomRotation = rotations[Math.floor(Math.random() * rotations.length)];
+        const animationDuration = Math.random() * 5 + 5; // 5-10 seconds
+        const zoomDuration = Math.random() * 3 + 2; // 2-5 seconds
+
+        egg.style.animation = `
+            ${randomAnimation} ${animationDuration}s linear infinite,
+            ${randomRotation} ${animationDuration}s linear infinite,
+            zoomInOut ${zoomDuration}s ease-in-out infinite
+        `;
+
+        aboutSection.appendChild(egg);
     }
+}
 
-    // Smooth scrolling for navigation
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
+function createFlyingCEGGs() {
+    const tokenomicsSection = document.getElementById('tokenomics');
+    
+    setInterval(() => {
+        const cegg = document.createElement('div');
+        cegg.className = 'flying-cegg';
+        
+        const wingTop = document.createElement('div');
+        wingTop.className = 'wings wing-top';
+        const wingBottom = document.createElement('div');
+        wingBottom.className = 'wings wing-bottom';
+        
+        cegg.appendChild(wingTop);
+        cegg.appendChild(wingBottom);
+        
+        const top = Math.random() * 80 + 10; // Keep within 10-90% of the height
+        cegg.style.top = `${top}%`;
+        
+        const animationDuration = Math.random() * 4 + 1; // 1-5 seconds
+        cegg.style.animation = `flyCEGG ${animationDuration}s linear`;
+        
+        tokenomicsSection.appendChild(cegg);
+        
+        // Create trail
+        const trail = document.createElement('div');
+        trail.className = 'trail';
+        trail.style.top = `${top}%`;
+        trail.style.left = '0';
+        tokenomicsSection.appendChild(trail);
+        
+        setTimeout(() => {
+            cegg.remove();
+            trail.remove();
+        }, animationDuration * 1000);
+    }, 500); // Create a new CEGG every 500ms
+}
+
+// Smooth scrolling for navigation
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
         });
     });
+});
 
-    // Copy contract address to clipboard
-    document.getElementById('copyAddress').addEventListener('click', function() {
-        const contractAddress = document.getElementById('contractAddress').textContent;
-        navigator.clipboard.writeText(contractAddress).then(() => {
-            alert('Contract address copied to clipboard!');
-        }).catch(err => {
-            console.error('Could not copy text: ', err);
-        });
+// Copy contract address to clipboard
+document.getElementById('copyAddress').addEventListener('click', function() {
+    const contractAddress = document.getElementById('contractAddress').textContent;
+    navigator.clipboard.writeText(contractAddress).then(() => {
+        alert('Contract address copied to clipboard!');
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
     });
+});
 </script>
 </body></html>
