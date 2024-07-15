@@ -14,15 +14,38 @@
         to { opacity: 1; }
     }
     @keyframes rotateGradient {
-        0% {
-            background-position: 0% 50%;
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    @keyframes coinShine {
+        0% { filter: brightness(100%); }
+        50% { filter: brightness(150%); }
+        100% { filter: brightness(100%); }
+    }
+    @keyframes coinGlow {
+        0% { box-shadow: 0 0 5px #FFD700; }
+        50% { box-shadow: 0 0 20px #FFD700; }
+        100% { box-shadow: 0 0 5px #FFD700; }
+    }
+    @keyframes flyCEGG {
+        0% { 
+            left: -20%;
+            opacity: 1;
         }
-        50% {
-            background-position: 100% 50%;
+        100% { 
+            left: 120%;
+            opacity: 1;
         }
-        100% {
-            background-position: 0% 50%;
-        }
+    }
+    @keyframes flameFlicker {
+        0%, 100% { opacity: 0.8; }
+        50% { opacity: 1; }
+    }
+    @keyframes trailFade {
+        0% { opacity: 0.8; width: 0; }
+        50% { opacity: 0.4; }
+        100% { opacity: 0; width: 100vw; }
     }
     body, html {
         margin: 0;
@@ -44,6 +67,7 @@
         align-items: center;
         color: #fff;
         position: relative;
+        overflow: hidden;
     }
     #hero {
         background: linear-gradient(45deg, #FFD700, #FFA500, #FF8C00, #FF7F50, #FF6347, #FFD700);
@@ -79,6 +103,65 @@
         background: linear-gradient(45deg, #B22222, #FF6347, #FF4500, #FF0000, #DC143C, #B22222);
         background-size: 600% 600%;
         animation: rotateGradient 15s ease infinite;
+        position: relative;
+    }
+    .flying-cegg {
+        position: absolute;
+        font-size: 24px;
+        font-weight: bold;
+        white-space: nowrap;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 120px;
+        height: 80px;
+        background-color: #e4e4e4;
+        border: 2px solid #999999;
+        border-radius: 20% 50% 50% 20%;
+        overflow: visible;
+    }
+    .flying-cegg::before {
+        content: 'CEGG';
+        position: absolute;
+        background: linear-gradient(to right, #FF69B4, #ff3838);
+        -webkit-background-clip: text;
+        color: transparent;
+        z-index: 3;
+    }
+    .flying-cegg::after {
+        content: '';
+        position: absolute;
+        left: -80px;
+        top: 0;
+        bottom: 0;
+        width: 60px;
+        background: linear-gradient(to left, #ff5c5c, #FF0000);
+        clip-path: polygon(0% 20%, 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 80%);
+        animation: flameFlicker 0.3s infinite alternate;
+        z-index: 1;
+    }
+    .flying-cegg .wings {
+        position: absolute;
+        width: 40px;
+        height: 30px;
+        background-color: #A9A9A9;
+        left: -40px;
+        z-index: 2;
+    }
+    .flying-cegg .wing-top {
+        top: -30px;
+        clip-path: polygon(0% 0%, 100% 100%, 0% 100%);
+    }
+    .flying-cegg .wing-bottom {
+        bottom: -30px;
+        clip-path: polygon(0% 100%, 100% 0%, 0% 0%);
+    }
+    .trail {
+        position: absolute;
+        height: 2px;
+        background: linear-gradient(to right, #FF0000, transparent);
+        animation: trailFade 3s linear;
     }
     .content {
         text-align: center;
@@ -143,7 +226,7 @@
         justify-content: center;
         align-items: center;
         font-weight: bold;
-        animation: float 3s infinite ease-in-out;
+        animation: float 3s infinite ease-in-out, coinShine 2s infinite, coinGlow 2s infinite;
     }
     @keyframes float {
         0%, 100% { transform: translateY(0); }
@@ -305,6 +388,7 @@
     window.addEventListener('load', () => {
         bgMusic.volume = 0.3;
         bgMusic.play();
+        createFlyingCEGGs();
     });
 
     muteBtn.addEventListener('click', () => {
@@ -324,10 +408,7 @@
         score++;
         scoreDisplay.textContent = `Score: ${score} $CEGG`;
         addCrack();
-
-        if (score % 10 === 0) {
-            spawnCoin();
-        }
+        spawnCoins(3);
     });
 
     function addCrack() {
@@ -349,17 +430,56 @@
         }
     }
 
-    function spawnCoin() {
-        const coin = document.createElement('div');
-        coin.className = 'coin';
-        coin.textContent = '$CEGG';
-        coin.style.left = `${Math.random() * 100}%`;
-        coin.style.top = `${Math.random() * 100}%`;
-        document.getElementById('game').appendChild(coin);
+    function spawnCoins(count) {
+        for (let i = 0; i < count; i++) {
+            const coin = document.createElement('div');
+            coin.className = 'coin';
+            coin.textContent = '$CEGG';
+            coin.style.left = `${Math.random() * 100}%`;
+            coin.style.top = `${Math.random() * 100}%`;
+            document.getElementById('game').appendChild(coin);
 
-        setTimeout(() => {
-            coin.remove();
-        }, 3000);
+            setTimeout(() => {
+                coin.remove();
+            }, 3000);
+        }
+    }
+
+    function createFlyingCEGGs() {
+        const tokenomicsSection = document.getElementById('tokenomics');
+        
+        setInterval(() => {
+            const cegg = document.createElement('div');
+            cegg.className = 'flying-cegg';
+            
+            const wingTop = document.createElement('div');
+            wingTop.className = 'wings wing-top';
+            const wingBottom = document.createElement('div');
+            wingBottom.className = 'wings wing-bottom';
+            
+            cegg.appendChild(wingTop);
+            cegg.appendChild(wingBottom);
+            
+            const top = Math.random() * 80 + 10; // Keep within 10-90% of the height
+            cegg.style.top = `${top}%`;
+            
+            const animationDuration = Math.random() * 4 + 1; // 1-5 seconds
+            cegg.style.animation = `flyCEGG ${animationDuration}s linear`;
+            
+            tokenomicsSection.appendChild(cegg);
+            
+            // Create trail
+            const trail = document.createElement('div');
+            trail.className = 'trail';
+            trail.style.top = `${top}%`;
+            trail.style.left = '0';
+            tokenomicsSection.appendChild(trail);
+            
+            setTimeout(() => {
+                cegg.remove();
+                trail.remove();
+            }, animationDuration * 1000);
+        }, 500); // Create a new CEGG every 500ms
     }
 
     // Smooth scrolling for navigation
@@ -377,7 +497,8 @@
         const contractAddress = document.getElementById('contractAddress').textContent;
         navigator.clipboard.writeText(contractAddress).then(() => {
             alert('Contract address copied to clipboard!');
-        }).catch(err => {console.error('Could not copy text: ', err);
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
         });
     });
 </script>
