@@ -1,5 +1,4 @@
-
-<html><head><base href="https://crackedegg.coin/"><title>Cracked Egg Coin - Hatch Your Crypto Fortune!</title><style>
+<html><head><title>Cracked Egg CEGG</title><style>
     @keyframes glow {
         0% { text-shadow: 0 0 5px #FFD700, 0 0 10px #FFD700, 0 0 15px #FFD700, 0 0 20px #FFA500, 0 0 25px #FFA500, 0 0 30px #FFA500, 0 0 35px #FFA500; }
         50% { text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700, 0 0 40px #FFA500, 0 0 50px #FFA500, 0 0 60px #FFA500, 0 0 70px #FFA500; }
@@ -87,16 +86,20 @@
         position: relative;
     }
     h1 {
-        font-size: 4em;
+        font-size: 6em;
         margin-bottom: 20px;
         animation: glow 1.5s infinite, pulse 1.5s infinite;
     }
+    h2 {
+        font-size: 5em;
+        margin-bottom: 20px;
+    }
     .subtitle {
-        font-size: 1.5em;
+        font-size: 1.7em;
         margin-bottom: 30px;
         animation: glow 1.5s infinite, pulse 1.5s infinite;
     }
-    p { font-size: 1.2em; max-width: 600px; margin: 0 auto 20px; }
+    p { font-size: 1.4em; max-width: 600px; margin: 0 auto 20px; }
     .btn {
         display: inline-block;
         padding: 10px 20px;
@@ -164,7 +167,7 @@
         color: #333;
         padding: 5px 10px;
         border-radius: 5px;
-        font-size: 0.9em;
+        font-size: 1.1em;
         margin-right: 10px;
     }
     .address-container {
@@ -179,7 +182,7 @@
     .chain-info {
         color: #fff;
         font-weight: bold;
-        font-size: 1.1em;
+        font-size: 1.3em;
         text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333;
         margin-left: 10px;
         display: flex;
@@ -213,6 +216,17 @@
     #muteBtn.muted {
         background-color: #ff4d4d;
         color: #fff;
+    }
+    
+    @media only screen and (max-width: 600px) {
+        h1 { font-size: 4.9em; }
+        h2 { font-size: 3.9em; }
+        .subtitle { font-size: 3em; }
+        p { font-size: 1.6em; }
+        .btn { font-size: 1.6em; padding: 14px 28px; }
+        #score { font-size: 2.7em; }
+        .chain-info { font-size: 1.7em; }
+        #contractAddress { font-size: 1.5em; }
     }
 </style></head>
 <body>
@@ -363,8 +377,7 @@
         const contractAddress = document.getElementById('contractAddress').textContent;
         navigator.clipboard.writeText(contractAddress).then(() => {
             alert('Contract address copied to clipboard!');
-        }).catch(err => {
-            console.error('Could not copy text: ', err);
+        }).catch(err => {console.error('Could not copy text: ', err);
         });
     });
 </script>
