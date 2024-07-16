@@ -47,6 +47,10 @@
         50% { opacity: 0.4; }
         100% { opacity: 0; width: 100vw; }
     }
+    @keyframes sparkle {
+        0%, 100% { opacity: 0; transform: scale(0); }
+        50% { opacity: 1; transform: scale(1); }
+    }
     body, html {
         margin: 0;
         padding: 0;
@@ -89,6 +93,15 @@
         opacity: 0;
         animation: fadeIn 2s ease-in-out forwards;
     }
+    .sparkle {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 0 5px #FFA500, 0 0 10px #FFA500;
+        animation: sparkle 1s infinite;
+    }
     #about {
         background: linear-gradient(45deg, #4B0082, #8A2BE2, #9400D3, #8B008B, #9932CC, #4B0082);
         background-size: 600% 600%;
@@ -103,6 +116,20 @@
         background: radial-gradient(ellipse at center, #FFD700 0%, #FFA500 100%);
         border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
         pointer-events: none;
+        overflow: hidden;
+    }
+    .flying-egg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            linear-gradient(45deg, transparent 45%, #B8860B 45%, #B8860B 55%, transparent 55%),
+            linear-gradient(-45deg, transparent 45%, #B8860B 45%, #B8860B 55%, transparent 55%);
+        background-size: 10px 10px;
+        opacity: 0.7;
     }
     @keyframes flyLeftToRight {
         from { left: -60px; }
@@ -330,6 +357,10 @@
         height: 20px;
         margin: 0 5px;
     }
+    .chain-info a {
+        color: inherit;
+        text-decoration: none;
+    }
     #muteBtn {
         background-color: #fff;
         border: none;
@@ -360,7 +391,7 @@
         h2 { font-size: 3.9em; }
         .subtitle { font-size: 3em; }
         p { font-size: 1.6em; }
-        .btn { font-size: 1.6em; padding: 14px 28px; }
+        .btn{ font-size: 1.6em; padding: 14px 28px; }
         #score { font-size: 2.7em; }
         .chain-info { font-size: 1.7em; }
         #contractAddress { font-size: 1.5em; }
@@ -369,6 +400,7 @@
 <body>
 <div class="container">
     <section id="hero" class="section">
+        <div id="sparkle-container"></div>
         <div class="content">
             <h1>Cracked Egg Coin</h1>
             <p class="subtitle">Hatch Your Crypto Fortune with the Eggciting New Meme Coin!</p>
@@ -391,6 +423,7 @@
             <div id="egg"></div>
             <div id="score">Score: 0 $CEGG</div>
             <a href="http://crackedegg.solofolio.net/game" class="btn" target="_blank">Take a crack at some games</a>
+            <a href="#tokenomics" class="btn">or not</a>
         </div>
     </section>
     
@@ -412,9 +445,9 @@
         <span id="contractAddress">0x0aa5317eb9a707fbc8c2ea7345d7968e670ed952</span>
         <button class="btn" id="copyAddress">Copy Address</button>
         <span class="chain-info">
-            Coin on
+            <a href="https://basescan.org/token/0x0aa5317eb9a707fbc8c2ea7345d7968e670ed952">Coin on</a>
             <img src="https://basescan.org/assets/base/images/svg/logos/chain-dim.svg" alt="Base Chain Logo" width="20" height="20">
-            Base Chain
+            <a href="https://basescan.org/token/0x0aa5317eb9a707fbc8c2ea7345d7968e670ed952">Base Chain</a>
         </span>
     </div>
     <div class="social-buttons">
@@ -430,159 +463,181 @@
 </audio>
 
 <script>
-    let score = 0;
+    let score = parseInt(localStorage.getItem('eggScore')) || 0;
     const egg = document.getElementById('egg');
     const scoreDisplay = document.getElementById('score');
     let cracks = [];
 
     const bgMusic = document.getElementById('bgMusic');
-const muteBtn = document.getElementById('muteBtn');
-let isMuted = false;
+    const muteBtn = document.getElementById('muteBtn');
+    let isMuted = false;
 
-window.addEventListener('load', () => {
-    bgMusic.volume = 0.3;
-    bgMusic.play();
-    createFlyingEggs();
-    createFlyingCEGGs();
-});
-
-muteBtn.addEventListener('click', () => {
-    if (isMuted) {
+    window.addEventListener('load', () => {
+        bgMusic.volume = 0.3;
         bgMusic.play();
-        muteBtn.textContent = '🔊';
-        muteBtn.classList.remove('muted');
-    } else {
-        bgMusic.pause();
-        muteBtn.textContent = '🔇';
-        muteBtn.classList.add('muted');
+        createFlyingEggs();
+        createFlyingCEGGs();
+        updateScore();
+        createSparkles();
+    });
+
+    muteBtn.addEventListener('click', () => {
+        if (isMuted) {
+            bgMusic.play();
+            muteBtn.textContent = '🔊';
+            muteBtn.classList.remove('muted');
+        } else {
+            bgMusic.pause();
+            muteBtn.textContent = '🔇';
+            muteBtn.classList.add('muted');
+        }
+        isMuted = !isMuted;
+    });
+
+    egg.addEventListener('click', () => {
+        score++;
+        updateScore();
+        addCrack();
+        spawnCoins(3);
+        localStorage.setItem('eggScore', score);
+    });
+
+    function updateScore() {
+        scoreDisplay.textContent = `Score: ${score} $CEGG`;
     }
-    isMuted = !isMuted;
-});
 
-egg.addEventListener('click', () => {
-    score++;
-    scoreDisplay.textContent = `Score: ${score} $CEGG`;
-    addCrack();
-    spawnCoins(3);
-});
+    function addCrack() {
+        const crack = document.createElement('div');
+        crack.className = 'crack';
+        const size = Math.random() * 30 + 20;
+        const left = Math.random() * (200 - size);
+        const top = Math.random() * (250 - size);
+        crack.style.width = `${size}px`;
+        crack.style.height = `${size}px`;
+        crack.style.left = `${left}px`;
+        crack.style.top = `${top}px`;
+        crack.style.clipPath = `polygon(${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%)`;
+        egg.appendChild(crack);
+        cracks.push(crack);
 
-function addCrack() {
-    const crack = document.createElement('div');
-    crack.className = 'crack';
-    const size = Math.random() * 30 + 20;
-    const left = Math.random() * (200 - size);
-    const top = Math.random() * (250 - size);
-    crack.style.width = `${size}px`;
-    crack.style.height = `${size}px`;
-    crack.style.left = `${left}px`;
-    crack.style.top = `${top}px`;
-    crack.style.clipPath = `polygon(${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%, ${Math.random()*100}% ${Math.random()*100}%)`;
-    egg.appendChild(crack);
-    cracks.push(crack);
-
-    if (cracks.length > 10) {
-        egg.removeChild(cracks.shift());
+        if (cracks.length > 10) {
+            egg.removeChild(cracks.shift());
+        }
     }
-}
 
-function spawnCoins(count) {
-    for (let i = 0; i < count; i++) {
-        const coin = document.createElement('div');
-        coin.className = 'coin';
-        coin.textContent = '$CEGG';
-        coin.style.left = `${Math.random() * 100}%`;
-        coin.style.top = `${Math.random() * 100}%`;
-        document.getElementById('game').appendChild(coin);
+    function spawnCoins(count) {
+        for (let i = 0; i < count; i++) {
+            const coin = document.createElement('div');
+            coin.className = 'coin';
+            coin.textContent = '$CEGG';
+            coin.style.left = `${Math.random() * 100}%`;
+            coin.style.top = `${Math.random() * 100}%`;
+            document.getElementById('game').appendChild(coin);
 
-        setTimeout(() => {
-            coin.remove();
-        }, 3000);
+            setTimeout(() => {
+                coin.remove();
+            }, 3000);
+        }
     }
-}
 
-function createFlyingEggs() {
-    const aboutSection = document.getElementById('about');
-    const eggCount = 20;
-    const animations = [
-        'flyLeftToRight', 'flyRightToLeft', 'flyBottomToTop', 'flyTopToBottom',
-        'flyDiagonal1', 'flyDiagonal2', 'flyDiagonal3', 'flyDiagonal4'
-    ];
-    const rotations = ['rotateLeft', 'rotateRight'];
+    function createFlyingEggs() {
+        const aboutSection = document.getElementById('about');
+        const eggCount = 20;
+        const animations = [
+            'flyLeftToRight', 'flyRightToLeft', 'flyBottomToTop', 'flyTopToBottom',
+            'flyDiagonal1', 'flyDiagonal2', 'flyDiagonal3', 'flyDiagonal4'
+        ];
+        const rotations = ['rotateLeft', 'rotateRight'];
 
-    for (let i = 0; i < eggCount; i++) {
-        const egg = document.createElement('div');
-        egg.className = 'flying-egg';
-        
-        const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
-        const randomRotation = rotations[Math.floor(Math.random() * rotations.length)];
-        const animationDuration = Math.random() * 5 + 5; // 5-10 seconds
-        const zoomDuration = Math.random() * 3 + 2; // 2-5 seconds
+        for (let i = 0; i < eggCount; i++) {
+            const egg = document.createElement('div');
+            egg.className = 'flying-egg';
+            
+            const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+            const randomRotation = rotations[Math.floor(Math.random() * rotations.length)];
+            const animationDuration = Math.random() * 5 + 5; // 5-10 seconds
+            const zoomDuration = Math.random() * 3 + 2; // 2-5 seconds
 
-        egg.style.animation = `
-            ${randomAnimation} ${animationDuration}s linear infinite,
-            ${randomRotation} ${animationDuration}s linear infinite,
-            zoomInOut ${zoomDuration}s ease-in-out infinite
-        `;
+            egg.style.animation = `
+                ${randomAnimation} ${animationDuration}s linear infinite,
+                ${randomRotation} ${animationDuration}s linear infinite,
+                zoomInOut ${zoomDuration}s ease-in-out infinite
+            `;
 
-        aboutSection.appendChild(egg);
+            aboutSection.appendChild(egg);
+        }
     }
-}
 
-function createFlyingCEGGs() {
-    const tokenomicsSection = document.getElementById('tokenomics');
-    
-    setInterval(() => {
-        const cegg = document.createElement('div');
-        cegg.className = 'flying-cegg';
+    function createFlyingCEGGs() {
+        const tokenomicsSection = document.getElementById('tokenomics');
         
-        const wingTop = document.createElement('div');
-        wingTop.className = 'wings wing-top';
-        const wingBottom = document.createElement('div');
-        wingBottom.className = 'wings wing-bottom';
-        
-        cegg.appendChild(wingTop);
-        cegg.appendChild(wingBottom);
-        
-        const top = Math.random() * 80 + 10; // Keep within 10-90% of the height
-        cegg.style.top = `${top}%`;
-        
-        const animationDuration = Math.random() * 4 + 1; // 1-5 seconds
-        cegg.style.animation = `flyCEGG ${animationDuration}s linear`;
-        
-        tokenomicsSection.appendChild(cegg);
-        
-        // Create trail
-        const trail = document.createElement('div');
-        trail.className = 'trail';
-        trail.style.top = `${top}%`;
-        trail.style.left = '0';
-        tokenomicsSection.appendChild(trail);
-        
-        setTimeout(() => {
-            cegg.remove();
-            trail.remove();
-        }, animationDuration * 1000);
-    }, 500); // Create a new CEGG every 500ms
-}
+        setInterval(() => {
+            const cegg = document.createElement('div');
+            cegg.className = 'flying-cegg';
+            
+            const wingTop = document.createElement('div');
+            wingTop.className = 'wings wing-top';
+            const wingBottom = document.createElement('div');
+            wingBottom.className = 'wings wing-bottom';
+            
+            cegg.appendChild(wingTop);
+            cegg.appendChild(wingBottom);
+            
+            const top = Math.random() * 80 + 10; // Keep within 10-90% of the height
+            cegg.style.top = `${top}%`;
+            
+            const animationDuration = Math.random() * 4 + 1; // 1-5 seconds
+            cegg.style.animation = `flyCEGG ${animationDuration}s linear`;
+            
+            tokenomicsSection.appendChild(cegg);
+            
+            // Create trail
+            const trail = document.createElement('div');
+            trail.className = 'trail';
+            trail.style.top = `${top}%`;
+            trail.style.left = '0';
+            tokenomicsSection.appendChild(trail);
+            
+            setTimeout(() => {
+                cegg.remove();
+                trail.remove();
+            }, animationDuration * 1000);
+        }, 500); // Create a new CEGG every 500ms
+    }
 
-// Smooth scrolling for navigation
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
+    function createSparkles() {
+        const sparkleContainer = document.getElementById('sparkle-container');
+        const sparkleCount = 100; // Increased from 50 to 100
+
+        for (let i = 0; i < sparkleCount; i++) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = `${Math.random() * 100}%`;
+            sparkle.style.top = `${Math.random() * 100}%`;
+            sparkle.style.animationDelay = `${Math.random() * 2}s`;
+            sparkleContainer.appendChild(sparkle);
+        }
+    }
+
+    // Smooth scrolling for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
         });
     });
-});
 
-// Copy contract address to clipboard
-document.getElementById('copyAddress').addEventListener('click', function() {
-    const contractAddress = document.getElementById('contractAddress').textContent;
-    navigator.clipboard.writeText(contractAddress).then(() => {
-        alert('Contract address copied to clipboard!');
-    }).catch(err => {
-        console.error('Could not copy text: ', err);
+    // Copy contract address to clipboard
+    document.getElementById('copyAddress').addEventListener('click', function() {
+        const contractAddress = document.getElementById('contractAddress').textContent;
+        navigator.clipboard.writeText(contractAddress).then(() => {
+            alert('Contract address copied to clipboard!');
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+        });
     });
-});
 </script>
-</body></html>
+</body>
+</html>
