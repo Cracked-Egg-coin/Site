@@ -33,7 +33,6 @@
             text-shadow: 0 0 10px #FFFFFF, 0 0 20px #FFFFFF, 0 0 30px #FFA500;
             -webkit-text-stroke: 1px white;
             animation: pulse 2s infinite;
-            width: 600px;
             text-align: center;
             margin-top: 40px;
         }
@@ -131,6 +130,37 @@
         }
         #connect-wallet:hover {
             background-color: #FFA500;
+        }
+        /* Mobile Styles */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5em;
+                width: 100%;
+                margin-top: 20px;
+            }
+            .version {
+                padding: 5px 10px;
+                font-size: 0.8em;
+            }
+            .container, .extra-container, #wallet-details-container, .chart-container {
+                width: 90%;
+                padding: 10px;
+            }
+            .extra-container, #wallet-details-container {
+                max-height: 200px;
+            }
+            .stat {
+                margin: 5px 0;
+                font-size: 0.9em;
+            }
+            #connect-wallet {
+                padding: 5px 10px;
+                font-size: 0.8em;
+            }
+            canvas {
+                width: 100%;
+                height: auto;
+            }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
