@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="https://crackedquests.io" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cracked Quests: The Eggcellent Adventure</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Press Start 2P', cursive;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    #game-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      margin-top: 20px;
+    }
+    #game-screen, #customization-panel {
+      box-shadow: 0 0 20px #0f0;
+    }
+    #game-screen {
+      width: 800px;
+      height: 600px;
+      border: 4px solid #0f0;
+      position: relative;
+      overflow: hidden;
+      background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23000033"/><circle cx="100" cy="100" r="1" fill="%23ffffff" opacity="0.8"/><circle cx="150" cy="50" r="1" fill="%23ffffff" opacity="0.6"/><circle cx="50" cy="150" r="1" fill="%23ffffff" opacity="0.7"/><circle cx="25" cy="75" r="1" fill="%23ffffff" opacity="0.5"/><circle cx="175" cy="125" r="1" fill="%23ffffff" opacity="0.9"/></svg>');
+      background-size: 200px 200px;
+      animation: scrollBackground 10s linear infinite;
+    }
+    #customization-panel {
+      width: 200px;
+      height: 600px;
+      border: 4px solid #0f0;
+      margin-left: 20px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+    .accessory {
+      width: 64px;
+      height: 64px;
+      margin: 10px;
+      cursor: move;
+      transition: transform 0.2s;
+    }
+    .accessory:hover {
+      transform: scale(1.1);
+    }
+    @keyframes scrollBackground {
+      from { background-position: 0 0; }
+      to { background-position: 0 600px; }
+    }
+    #player {
+      width: 64px;
+      height: 64px;
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: float 2s infinite ease-in-out;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.7));
+      transition: all 0.3s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(-50%); }
+      50% { transform: translateY(-10px) translateX(-50%); }
+    }
+    #hud, #powerup-counter {
+      position: absolute;
+      top: 10px;
+      font-size: 18px;
+      text-shadow: 0 0 5px #0f0;
+    }
+    #hud { left: 10px; }
+    #powerup-counter { right: 10px; }
+    #lives {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
+      text-shadow: 0 0 5px #0f0;
+    }
+    .heart {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 3.22l-.61-.6a5.5 5.5 0 0 0-7.78 7.77L10 18.78l8.39-8.4a5.5 5.5 0 0 0-7.78-7.77l-.61.61z" fill="%23ff0000"/></svg>');
+      background-size: contain;
+    }
+    .enemy, .powerup {
+      position: absolute;
+    }
+    .powerup {
+      width: 30px;
+      height: 30px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><polygon points="15,0 18.5,10 30,10 21,17 25,30 15,22 5,30 9,17 0,10 11.5,10" fill="%23ffff00" stroke="%23ffffff" stroke-width="1"/></svg>');
+    }
+    @keyframes twinkle {
+      0% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      75% { transform: rotate(-5deg); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    #start-screen, #pause-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    #start-button, #pause-button, #resume-button, #mute-button {
+      background-color: #0f0;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      font-size: 24px;
+      cursor: pointer;
+      font-family: 'Press Start 2P', cursive;
+      transition: all 0.3s;
+      margin: 10px;
+    }
+    #start-button:hover, #pause-button:hover, #resume-button:hover, #mute-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 10px #0f0;
+    }
+    #game-title {
+      color: #0f0;
+      font-size: 36px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #0f0;
+      text-align: center;
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+    }
+    #game-description {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: rgba(0, 255, 0, 0.1);
+      border: 2px solid #0f0;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    @keyframes shine {
+      0% { filter: brightness(1) drop-shadow(0 0 10px rgba(255,255,255,0.7)); }
+      50% { filter: brightness(1.5) drop-shadow(0 0 20px rgba(255,255,255,0.9)); }
+      100% { filter: brightness(1) drop-shadow(0 0 10px rgba(255,255,255,0.7)); }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="game-screen">
+      <h1 id="game-title">Cracked Quests: The Eggcellent Adventure</h1>
+      <div id="player"></div>
+      <div id="hud">Score: <span id="score">0</span></div>
+      <div id="lives"></div>
+      <div id="powerup-counter">Power-ups: <span id="powerup-count">0</span></div>
+      <div id="start-screen">
+        <button id="start-button">Start Game</button>
+      </div>
+      <div id="pause-screen" style="display: none;">
+        <h2>Game Paused</h2>
+        <button id="resume-button">Resume Game</button>
+      </div>
+    </div>
+    <div id="customization-panel">
+      <h3>Customize Your Egg</h3>
+    </div>
+  </div>
+  <div>
+    <button id="pause-button">Pause Game</button>
+    <button id="mute-button">Mute Music</button>
+  </div>
+  <div id="game-description">
+    <h2>Welcome to Cracked Quests: The Eggcellent Adventure!</h2>
+    <p>Embark on a cosmic journey as a newly hatched hero in Cracked Quests: The Eggcellent Adventure! Navigate through the stars, dodge galactic obstacles, and collect powerful items to enhance your egg avatar.</p>
+    <p>Use your mouse to guide your egg-shaped character through the scrolling star field. Avoid the various enemies that threaten to crack your shell! As you progress, the challenges become more intense, testing your reflexes and determination.</p>
+    <p>With each successful dodge, your score increases, unlocking new abilities and customizations for your egg avatar. Can you achieve the highest score and become the most legendary egg in the galaxy?</p>
+    <p>Immerse yourself in the retro-futuristic soundtrack, feel the rush of narrowly avoiding obstacles, and experience the thrill of the Eggcellent Adventure. Are you ready to crack the code and become a true hero of the cosmic egg realm?</p>
+  </div>
+  <script>
+    const player = document.getElementById('player');
+    const gameScreen = document.getElementById('game-screen');
+    const scoreElement = document.getElementById('score');
+    const powerupCountElement = document.getElementById('powerup-count');
+    const livesElement = document.getElementById('lives');
+    const startScreen = document.getElementById('start-screen');
+    const startButton = document.getElementById('start-button');
+    const pauseScreen = document.getElementById('pause-screen');
+    const pauseButton = document.getElementById('pause-button');
+    const resumeButton = document.getElementById('resume-button');
+    const muteButton = document.getElementById('mute-button');
+    const customizationPanel = document.getElementById('customization-panel');
+
+    let score = 0;
+    let powerupCount = 0;
+    let lives = 3;
+    let gameLoop;
+    let powerupInterval;
+    let enemyInterval;
+    let secondaryEnemyInterval;
+    let difficulty = 1;
+    let playerInvincible = false;
+    let gamePaused = false;
+    let musicMuted = false;
+    let powerups = [];
+    let enemies = [];
+    let currentMusicIndex = 0;
+
+    const baseEgg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+      <defs>
+        <radialGradient id="eggGrad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+          <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" />
+          <stop offset="100%" style="stop-color:rgb(245,245,220);stop-opacity:1" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="32" cy="32" rx="30" ry="28" fill="url(#eggGrad)" stroke="#000" stroke-width="2"/>
+      <path d="M20 40 Q32 60 44 40" fill="none" stroke="#ff0000" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="24" cy="28" r="3" fill="#000"/>
+      <circle cx="40" cy="28" r="3" fill="#000"/>
+    </svg>`;
+
+    player.innerHTML = baseEgg;
+
+    const accessories = [
+      { type: 'hat', svg: '<circle cx="32" cy="10" r="8" fill="red"/>' },
+      { type: 'hat', svg: '<polygon points="20,15 44,15 32,5" fill="green"/>' },
+      { type: 'hat', svg: '<rect x="20" y="5" width="24" height="10" fill="blue"/>' },
+      { type: 'hat', svg: '<path d="M20 15 Q32 0 44 15" fill="yellow"/>' },
+      { type: 'hat', svg: '<ellipse cx="32" cy="10" rx="12" ry="6" fill="purple"/>' },
+      { type: 'glasses', svg: '<g transform="translate(0, -4)"><circle cx="24" cy="28" r="6" fill="none" stroke="blue" stroke-width="2"/><circle cx="40" cy="28" r="6" fill="none" stroke="blue" stroke-width="2"/><path d="M30 28 L34 28" stroke="blue" stroke-width="2"/></g>' },
+      { type: 'glasses', svg: '<rect x="20" y="25" width="24" height="6" fill="purple" rx="2"/>' },
+      { type: 'glasses', svg: '<path d="M20 28 Q32 35 44 28" fill="none" stroke="green" stroke-width="2"/>' },
+      { type: 'glasses', svg: '<g transform="translate(0, -4)"><rect x="18" y="26" width="12" height="8" fill="none" stroke="red" stroke-width="2"/><rect x="34" y="26" width="12" height="8" fill="none" stroke="red" stroke-width="2"/></g>' },
+      { type: 'scarf', svg: '<path d="M10 50 Q32 60 54 50" stroke="yellow" stroke-width="4" fill="none"/>' },
+      { type: 'scarf', svg: '<path d="M10 50 Q32 70 54 50" stroke="pink" stroke-width="4" fill="none"/>' },
+      { type: 'scarf', svg: '<rect x="10" y="50" width="44" height="6" fill="orange"/>' },
+      { type: 'scarf', svg: '<path d="M10 50 L54 50L54 56 L10 56 Z" fill="purple"/>' },
+      { type: 'wig', svg: '<path d="M15 15 Q32 0 49 15 Q40 25 32 20 Q24 25 15 15" fill="brown" class="wig-animated"/>' },
+      { type: 'wig', svg: '<path d="M15 10 Q32 30 49 10 Q40 0 32 5 Q24 0 15 10" fill="blonde" class="wig-animated"/>' },
+      { type: 'wig', svg: '<path d="M15 5 Q32 20 49 5 Q40 15 32 10 Q24 15 15 5" fill="black" class="wig-animated"/>' },
+      { type: 'wig', svg: '<path d="M15 10 Q32 -5 49 10 Q40 25 32 15 Q24 25 15 10" fill="red" class="wig-animated"/>' },
+      { type: 'wig', svg: '<path d="M15 8 Q32 30 49 8 Q40 -5 32 10 Q24 -5 15 8" fill="gray" class="wig-animated"/>' },
+    ];
+
+    let addedAccessories = new Set();
+
+    function debounce(func, delay) {
+      let timeoutId;
+      return (...args) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    const movePlayer = debounce((e) => {
+      if (!gamePaused) {
+        const rect = gameScreen.getBoundingClientRect();
+        const x = e.clientX - rect.left - player.clientWidth / 2;
+        const y = e.clientY - rect.top - player.clientHeight / 2;
+        player.style.left = `${Math.max(-player.clientWidth / 2, Math.min(x, rect.width - player.clientWidth / 2))}px`;
+        player.style.top = `${Math.max(-player.clientHeight / 2, Math.min(y, rect.height - player.clientHeight / 2))}px`;
+      }
+    }, 10);
+
+    function createPowerup() {
+      if (!gamePaused) {
+        const powerup = document.createElement('div');
+        powerup.classList.add('powerup');
+        powerup.style.left = `${Math.random() * (gameScreen.clientWidth - 30)}px`;
+        powerup.style.top = '-30px';
+        gameScreen.appendChild(powerup);
+        powerups.push(powerup);
+      }
+    }
+
+    function createEnemy() {
+      if (!gamePaused) {
+        const enemy = document.createElement('div');
+        enemy.classList.add('enemy');
+        const isCat = Math.random() > 0.5;
+        if (isCat) {
+          enemy.classList.add('cat');
+          enemy.innerHTML = getCatSVG();
+          enemy.style.animation = 'wiggle 1s infinite';
+        } else {
+          enemy.classList.add('dog');
+          enemy.innerHTML = getDogSVG();
+          enemy.style.animation = 'bounce 1s infinite';
+        }
+        enemy.style.left = `${Math.random() * (gameScreen.clientWidth - 40)}px`;
+        enemy.style.top = '-60px';  // Make enemies larger
+        gameScreen.appendChild(enemy);
+        enemies.push(enemy);
+      }
+    }
+
+    function createSecondaryEnemy() {
+      if (!gamePaused) {
+        const enemy = document.createElement('div');
+        enemy.classList.add('enemy');
+        const isCat = Math.random() > 0.5;
+        if (isCat) {
+          enemy.classList.add('cat');
+          enemy.innerHTML = getCatSVG();
+          enemy.style.animation = 'wiggle 1s infinite';
+        } else {
+          enemy.classList.add('dog');
+          enemy.innerHTML = getDogSVG();
+          enemy.style.animation = 'bounce 1s infinite';
+        }
+        enemy.style.left = `${Math.random() * (gameScreen.clientWidth - 40)}px`;
+        enemy.style.top = '-60px';  // Make enemies larger
+        gameScreen.appendChild(enemy);
+        enemies.push(enemy);
+      }
+    }
+
+    function getCatSVG() {
+      const cats = [
+        '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 64 64"><polygon points="32,0 24,8 24,16 32,24 40,16 40,8" fill="#f0f"/><circle cx="32" cy="40" r="16" fill="#f0f"/><circle cx="28" cy="36" r="2" fill="#fff"/><circle cx="36" cy="36" r="2" fill="#fff"/><path d="M32 44 Q32 50 28 50" stroke="#fff" stroke-width="2" fill="none"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 64 64"><polygon points="32,0 24,8 24,16 32,24 40,16 40,8" fill="#ff0"/><circle cx="32" cy="40" r="16" fill="#ff0"/><circle cx="28" cy="36" r="2" fill="#fff"/><circle cx="36" cy="36" r="2" fill="#fff"/><path d="M32 44 Q32 50 28 50" stroke="#fff" stroke-width="2" fill="none"/></svg>'
+      ];
+      return cats[Math.floor(Math.random() * cats.length)];
+    }
+
+    function getDogSVG() {
+      const dogs = [
+        '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 64 64"><polygon points="32,0 28,12 36,12" fill="#0f0"/><circle cx="32" cy="32" r="16" fill="#0f0"/><circle cx="28" cy="28" r="2" fill="#fff"/><circle cx="36" cy="28" r="2" fill="#fff"/><path d="M32 36 Q36 40 32 44 Q28 40 32 36" fill="#fff"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 64 64"><polygon points="32,0 28,12 36,12" fill="#f00"/><circle cx="32" cy="32" r="16" fill="#f00"/><circle cx="28" cy="28" r="2" fill="#fff"/><circle cx="36" cy="28" r="2" fill="#fff"/><path d="M32 36 Q36 40 32 44 Q28 40 32 36" fill="#fff"/></svg>'
+      ];
+      return dogs[Math.floor(Math.random() * dogs.length)];
+    }
+
+    function checkCollision(a, b) {
+      const aRect = a.getBoundingClientRect();
+      const bRect = b.getBoundingClientRect();
+      return !(
+        aRect.top + aRect.height < bRect.top ||
+        aRect.top > bRect.top + bRect.height ||
+        aRect.left + aRect.width < bRect.left ||
+        aRect.left > bRect.left + bRect.width
+      );
+    }
+
+    function activatePowerup() {
+      playerInvincible = true;
+      powerupCount++;
+      score += 5;
+      scoreElement.textContent = score;
+      powerupCountElement.textContent = powerupCount;
+      player.style.animation = 'shine 0.5s infinite';
+      playSound(660, 0.2); // Powerup sound
+      
+      if (powerupCount % 25 === 0 && lives < 9) {
+        lives++;
+        updateLives();
+      }
+      
+      setTimeout(() => {
+        playerInvincible = false;
+        player.style.animation = 'float 2s infinite ease-in-out';
+      }, 3000);
+    }
+
+    function loseLife() {
+      lives--;
+      updateLives();
+      if (lives <= 0) {
+        endGame();
+      } else {
+        playerInvincible = true;
+        player.style.animation = 'shine 0.5s infinite';
+        setTimeout(() => {
+          playerInvincible = false;
+          player.style.animation = 'float 2s infinite ease-in-out';
+        }, 2000);
+      }
+    }
+
+    function updateLives() {
+      livesElement.innerHTML = Array(lives).fill('<span class="heart"></span>').join('');
+    }
+
+    function playSound(frequency, duration) {
+      if (!musicMuted) {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + duration);
+      }
+    }
+
+    let audioContext, currentMusic;
+
+    const musicTracks = [
+      { url: 'https://www.bensound.com/bensound-music/bensound-dubstep.mp3' },
+      { url: 'https://www.bensound.com/bensound-music/bensound-epic.mp3' },
+      { url: 'https://www.bensound.com/bensound-music/bensound-retrosoul.mp3' },
+      { url: 'https://www.bensound.com/bensound-music/bensound-summer.mp3' },
+      { url: 'https://www.bensound.com/bensound-music/bensound-thejazzpiano.mp3' }
+    ];
+
+    function playBackgroundMusic() {
+      if (!musicMuted && !gamePaused) {
+        if (currentMusic) {
+          currentMusic.pause();
+        }
+
+        currentMusic = new Audio(musicTracks[currentMusicIndex].url);
+        currentMusic.loop = true;
+        currentMusic.play();
+      }
+    }
+
+    function startGame() {
+      score = 0;
+      powerupCount = 0;
+      lives = 3;
+      difficulty = 1;
+      scoreElement.textContent = score;
+      powerupCountElement.textContent = powerupCount;
+      updateLives();
+      startScreen.style.display = 'none';
+      gameScreen.addEventListener('mousemove', movePlayer);
+      powerupInterval = setInterval(createPowerup, 5000);
+      enemyInterval = setInterval(createEnemy, 4000); // Further reduced enemy creation rate
+      secondaryEnemyInterval = setInterval(createSecondaryEnemy, 8000); // Further reduced secondary enemy creation rate
+      gameLoop = requestAnimationFrame(update);
+      playBackgroundMusic();
+    }
+
+    function endGame() {
+      gameScreen.removeEventListener('mousemove', movePlayer);
+      clearInterval(powerupInterval);
+      clearInterval(enemyInterval);
+      clearInterval(secondaryEnemyInterval);
+      cancelAnimationFrame(gameLoop);
+      startScreen.style.display = 'flex';
+      startButton.textContent = 'Play Again';
+      powerups.forEach(pu => pu.remove());
+      enemies.forEach(en => en.remove());
+      powerups = [];
+      enemies = [];
+      if (currentMusic) {
+        currentMusic.pause();
+      }
+    }
+
+    function update() {
+      if (!gamePaused) {
+        movePowerups();
+        moveEnemies();
+        checkCollisions();
+        gameLoop = requestAnimationFrame(update);
+        if (score > 0 && score % 100 === 0) {
+          difficulty += 0.05; // More gradual increase
+        }
+        if (score > 0 && score % 25 === 0) {
+          changeMusic();
+        }
+      }
+    }
+
+    function movePowerups() {
+      powerups.forEach((powerup, index) => {
+        const top = powerup.offsetTop;
+        if (top > gameScreen.clientHeight) {
+          powerup.remove();
+          powerups.splice(index, 1);
+        } else {
+          powerup.style.top = `${top + 1}px`;
+        }
+      });
+    }
+
+    function moveEnemies() {
+      enemies.forEach((enemy, index) => {
+        const top = enemy.offsetTop;
+        if (top > gameScreen.clientHeight) {
+          enemy.remove();
+          enemies.splice(index, 1);
+          score++;
+          scoreElement.textContent = score;
+          if (score % 20 === 0) {
+            addNewAccessory();
+          }
+        } else {
+          enemy.style.top = `${top + (1.5 * difficulty)}px`;
+        }
+      });
+    }
+
+    function checkCollisions() {
+      powerups.forEach((powerup, index) => {
+        if (checkCollision(player, powerup)) {
+          activatePowerup();
+          powerup.remove();
+          powerups.splice(index, 1);
+        }
+      });
+
+      enemies.forEach((enemy, index) => {
+        if (checkCollision(player, enemy)) {
+          if (!playerInvincible) {
+            loseLife();
+          }
+          enemy.remove();
+          enemies.splice(index, 1);
+        }
+      });
+    }
+
+    function addNewAccessory() {
+      if (addedAccessories.size < accessories.length) {
+        let newAccessory;
+        do {
+          newAccessory = accessories[Math.floor(Math.random() * accessories.length)];
+        } while (addedAccessories.has(newAccessory.type));
+
+        addedAccessories.add(newAccessory.type);
+
+        const accessoryElement = document.createElement('div');
+        accessoryElement.classList.add('accessory');
+        accessoryElement.setAttribute('draggable', 'true');
+        accessoryElement.setAttribute('data-type', newAccessory.type);
+        accessoryElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">${newAccessory.svg}</svg>`;
+        
+        accessoryElement.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', newAccessory.type);
+        });
+
+        customizationPanel.appendChild(accessoryElement);
+      }
+    }
+
+    player.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
+    player.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const accessoryType = e.dataTransfer.getData('text');
+      addAccessoryToPlayer(accessoryType);
+      playSound(440, 0.1); // Accessory drop sound
+    });
+
+    function addAccessoryToPlayer(accessoryType) {
+      const playerSvg = player.querySelector('svg');
+      const existingAccessory = playerSvg.querySelector(`[data-type="${accessoryType}"]`);
+      
+      if (existingAccessory) {
+        existingAccessory.remove();
+      }
+
+      const newAccessory = accessories.find(acc => acc.type === accessoryType);
+      if (newAccessory) {
+        const accessoryElement = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        accessoryElement.innerHTML = newAccessory.svg;
+        accessoryElement.setAttribute('data-type', accessoryType);
+        playerSvg.appendChild(accessoryElement);
+      }
+    }
+
+    function changeMusic() {
+      currentMusicIndex = (currentMusicIndex + 1) % musicTracks.length;
+      if (currentMusic) {
+        currentMusic.pause();
+      }
+      playBackgroundMusic();
+    }
+
+    function togglePause() {
+      gamePaused = !gamePaused;
+      if (gamePaused) {
+        pauseScreen.style.display = 'flex';
+        cancelAnimationFrame(gameLoop);
+        if (currentMusic) {
+          currentMusic.pause();
+        }
+      } else {
+        pauseScreen.style.display = 'none';
+        gameLoop = requestAnimationFrame(update);
+        if (!musicMuted) {
+          playBackgroundMusic();
+        }
+      }
+    }
+
+    function toggleMute() {
+      musicMuted = !musicMuted;
+      muteButton.textContent = musicMuted ? 'Unmute Music' : 'Mute Music';
+      if (musicMuted) {
+        if (currentMusic) {
+          currentMusic.pause();
+        }
+      } else {
+        playBackgroundMusic();
+      }
+    }
+
+    startButton.addEventListener('click', startGame);
+    pauseButton.addEventListener('click', togglePause);
+    resumeButton.addEventListener('click', togglePause);
+    muteButton.addEventListener('click', toggleMute);
+
+    // Initialize with some accessories
+    for (let i = 0; i < 3; i++) {
+      addNewAccessory();
+    }
+
+  </script>
+  <nav style="position: fixed; bottom: 10px; right: 10px; background-color: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px;">
+    <a href="https://crackedquests.io/leaderboard" style="color: #0f0; text-decoration: none; margin-right: 10px;">Leaderboard</a>
+    <a href="https://crackedquests.io/shop" style="color: #0f0; text-decoration: none;">Egg Shop</a>
+  </nav>
+</body>
+</html>
